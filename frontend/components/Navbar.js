@@ -1,9 +1,28 @@
+"use client";
+
 import Link from 'next/link';
-import { ShieldCheck } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { ShieldCheck, LogOut } from 'lucide-react';
+import { adminLogout } from '@/lib/api';
 
 const Navbar = () => {
+  const pathname = usePathname();
+  const router = useRouter();
+  
+  const isAdminArea = pathname?.startsWith('/admin');
+  const isLoginPage = pathname === '/admin/login';
+
+  const handleLogout = async () => {
+    try {
+      await adminLogout();
+      router.push('/admin/login');
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   return (
-    <nav className="border-b border-white/10 bg-[#050816]/70 backdrop-blur-lg sticky top-0 z-50">
+    <nav className="border-b border-white/10 bg-[#050816]/90 backdrop-blur-sm sticky top-0 z-50" style={{ contain: 'layout style', willChange: 'transform' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
@@ -21,15 +40,25 @@ const Navbar = () => {
             >
               Verify
             </Link>
-            <Link 
-              href="/admin" 
-              className="relative inline-flex h-10 items-center justify-center overflow-hidden rounded-md p-[1px] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-950 transition-transform hover:scale-105 active:scale-95"
-            >
-              <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#050816_0%,#22d3ee_50%,#050816_100%)]" />
-              <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-slate-950 px-4 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-slate-900">
-                Issuer Dashboard
-              </span>
-            </Link>
+            
+            {isAdminArea && !isLoginPage ? (
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-950/30 px-3 py-2 rounded-md text-sm font-medium transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            ) : (
+              <Link 
+                href="/admin" 
+                className="relative inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-cyan-500/20 via-cyan-400/40 to-cyan-500/20 p-[1px] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-950 transition-transform hover:scale-105 active:scale-95"
+              >
+                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-md bg-slate-950 px-4 py-1 text-sm font-medium text-white transition-colors hover:bg-slate-900">
+                  Admin Portal
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       </div>

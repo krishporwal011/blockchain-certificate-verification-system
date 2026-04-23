@@ -1,12 +1,18 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const certificateRoutes = require('./routes/certificateRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -14,6 +20,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
+app.use('/api/admin', adminRoutes);
 app.use('/api/certificates', certificateRoutes);
 
 // Error Handling

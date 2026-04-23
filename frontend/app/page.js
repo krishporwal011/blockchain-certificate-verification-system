@@ -4,9 +4,8 @@ import { ArrowRight, FileCheck, Shield, UploadCloud, Terminal } from "lucide-rea
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-130px)] px-4 relative">
-      {/* Background ambient glows */}
+      {/* Background ambient glow */}
       <div className="ambient-glow top-0 left-1/4 -translate-y-1/2"></div>
-      <div className="ambient-glow bottom-0 right-1/4 translate-y-1/2 opacity-50 bg-[radial-gradient(circle,rgba(34,211,238,0.15)_0%,rgba(0,0,0,0)_70%)]"></div>
 
       <div className="max-w-5xl w-full text-center space-y-8 relative z-10">
         
@@ -31,14 +30,14 @@ export default function Home() {
             href="/verify" 
             className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-lg font-semibold text-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 transition-all shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:shadow-[0_0_30px_rgba(34,211,238,0.6)]"
           >
-            Launch Verification
+            Verify Certificate
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link 
             href="/admin" 
             className="flex items-center justify-center gap-2 px-8 py-4 rounded-lg font-semibold text-lg text-white glass-panel hover:bg-white/10 hover:border-cyan-400/50 transition-all shadow-lg"
           >
-            Issuer Terminal
+            Admin Portal
           </Link>
         </div>
       </div>

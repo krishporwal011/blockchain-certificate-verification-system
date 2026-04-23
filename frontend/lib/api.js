@@ -4,7 +4,27 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
 export const api = axios.create({
   baseURL: API_URL,
+  withCredentials: true, // Crucial for sending/receiving HTTP-only cookies
 });
+
+// --- Admin Authentication API ---
+
+export const adminLogin = async (credentials) => {
+  const response = await api.post('/admin/login', credentials);
+  return response.data;
+};
+
+export const adminLogout = async () => {
+  const response = await api.post('/admin/logout');
+  return response.data;
+};
+
+export const checkAdminAuth = async () => {
+  const response = await api.get('/admin/me');
+  return response.data;
+};
+
+// --- Certificate API ---
 
 export const issueCertificate = async (formData) => {
   const response = await api.post('/certificates/issue', formData, {
