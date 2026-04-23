@@ -18,7 +18,9 @@ if (env.RPC_URL && env.PRIVATE_KEY && env.CONTRACT_ADDRESS) {
   wallet = new ethers.Wallet(env.PRIVATE_KEY, provider);
   contract = new ethers.Contract(env.CONTRACT_ADDRESS, contractABI, wallet);
 } else {
-  console.warn("Blockchain credentials missing in .env. Contract interaction will fail.");
+  console.error("❌ CRITICAL ERROR: Blockchain credentials missing in .env!");
+  console.error("Ensure RPC_URL, PRIVATE_KEY, and CONTRACT_ADDRESS are set.");
+  console.error("Contract interaction will fail.");
 }
 
 module.exports = {

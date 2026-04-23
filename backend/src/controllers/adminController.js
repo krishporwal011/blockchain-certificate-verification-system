@@ -16,11 +16,13 @@ const login = (req, res) => {
       { expiresIn: '8h' }
     );
 
+    const isProd = process.env.NODE_ENV === 'production';
+
     // Set HTTP-only cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProd, // Must be true in production for cross-origin
+      sameSite: isProd ? 'none' : 'lax', // 'none' allows cross-origin on Vercel/Render
       maxAge: 8 * 60 * 60 * 1000 // 8 hours
     });
 
@@ -31,10 +33,12 @@ const login = (req, res) => {
 };
 
 const logout = (req, res) => {
+  const isProd = process.env.NODE_ENV === 'production';
+  
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax'
   });
   return res.status(200).json({ success: true, message: 'Logged out successfully' });
 };
