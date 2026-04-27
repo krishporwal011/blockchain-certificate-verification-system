@@ -47,12 +47,14 @@ function VerifyContent() {
       }
     } catch (err) {
       console.error("[DEBUG] Verify Page: Verification request failed", err);
+      const backendMessage = err.response?.data?.message;
+
       if (err.response?.status === 404) {
         setError(`Certificate not found: "${idToVerify}" does not exist on the ledger.`);
       } else if (err.response?.status === 500) {
-        setError("Verification node error: The backend failed to query the blockchain.");
+        setError(`Verification node error: ${backendMessage || "The backend failed to query the blockchain."}`);
       } else {
-        setError("Network error: Could not reach the verification API.");
+        setError(`Network error: ${backendMessage || "Could not reach the verification API."}`);
       }
     } finally {
       setLoading(false);
