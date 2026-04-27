@@ -1,7 +1,10 @@
 import "@nomicfoundation/hardhat-toolbox";
 import "dotenv/config";
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+let PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+if (PRIVATE_KEY && !PRIVATE_KEY.startsWith('0x')) {
+  PRIVATE_KEY = '0x' + PRIVATE_KEY;
+}
 const RPC_URL = process.env.RPC_URL || "";
 
 export default {
