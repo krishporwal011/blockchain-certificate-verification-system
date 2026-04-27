@@ -76,12 +76,18 @@ const issueCertificate = async (req, res, next) => {
 const verifyCertificate = async (req, res, next) => {
   try {
     const { certificateId } = req.params;
+    console.log(`[DEBUG] Backend Verify: Received lookup request for ID: ${certificateId}`);
+    
+    // Attempt blockchain lookup
+    console.log(`[DEBUG] Backend Verify: Starting blockchain lookup...`);
     const onChainData = await verifyCertificateOnChain(certificateId);
 
     if (!onChainData.exists) {
+      console.log(`[DEBUG] Backend Verify: Lookup finished - Certificate NOT FOUND`);
       return res.status(404).json({ success: false, status: 'NOT_FOUND', message: 'Certificate not found' });
     }
 
+    console.log(`[DEBUG] Backend Verify: Lookup finished - Certificate FOUND!`);
     const status = onChainData.revoked ? 'REVOKED' : 'VALID';
 
     res.status(200).json({
@@ -90,7 +96,13 @@ const verifyCertificate = async (req, res, next) => {
       ...onChainData
     });
   } catch (error) {
-    next(error);
+    console.error(`[DEBUG] Backend Verify: Error during blockchain lookup!`, error.message);
+    if (error.message.includes('call revert exception') || error.message.includes('missing revert data')) {
+       // Graceful fallback for contract reading errors
+       return res.status(404).json({ success: false, status: 'NOT_FOUND', message: 'Certificate not found (Blockchain exception)' });
+    }
+    // Return 500 for network/RPC errors
+    res.status(500).json({ success: false, message: 'Blockchain node query failed', error: error.message });
   }
 };
 

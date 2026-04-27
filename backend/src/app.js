@@ -36,19 +36,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // TEMPORARY DEBUG ROUTE
-app.get('/api/debug/runtime', (req, res) => {
+app.get('/api/debug/verify-info', (req, res) => {
   const env = require('./config/env');
-  const isAlchemySepolia = !!(env.RPC_URL && env.RPC_URL.includes('eth-sepolia.g.alchemy.com'));
-  const apiKeyMatch = env.RPC_URL ? env.RPC_URL.match(/\/v2\/([a-zA-Z0-9_-]+)$/) : null;
   
   res.status(200).json({
-    nodeEnv: env.NODE_ENV,
-    rpcUrlExists: !!env.RPC_URL,
-    rpcIsAlchemySepolia: isAlchemySepolia,
-    rpcLast6: apiKeyMatch ? apiKeyMatch[1].slice(-6) : (env.RPC_URL ? 'Unknown Format' : null),
-    privateKeyExists: !!env.PRIVATE_KEY,
-    contractAddressExists: !!env.CONTRACT_ADDRESS,
-    backendEntrypoint: process.argv[1] || 'Unknown'
+    verifyRoute: "/api/certificates/verify/:certificateId",
+    backendHealthy: true,
+    corsFrontendAllowed: !!env.FRONTEND_BASE_URL,
+    rpcConfigured: !!env.RPC_URL
   });
 });
 
