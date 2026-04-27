@@ -13,33 +13,54 @@ let provider;
 let wallet;
 let contract;
 
-if (!env.RPC_URL) {
+// 1. Validate RPC_URL
+let rpcUrl = env.RPC_URL ? env.RPC_URL.trim() : '';
+if (!rpcUrl) {
   console.error("❌ CRITICAL ERROR: RPC_URL is missing in environment variables!");
-  process.exit(1); // Fail fast
+  process.exit(1);
+}
+if (!rpcUrl.startsWith('https://')) {
+  console.error("❌ CRITICAL ERROR: RPC_URL must start with https://");
+  process.exit(1);
+}
+if (!rpcUrl.includes('eth-sepolia.g.alchemy.com')) {
+  console.error("❌ CRITICAL ERROR: RPC_URL must contain eth-sepolia.g.alchemy.com");
+  process.exit(1);
 }
 
-if (!env.RPC_URL.includes('alchemy.com')) {
-  console.warn("⚠️ WARNING: RPC_URL does not seem to be an Alchemy URL. Using it anyway.");
+// 2. Validate and Normalize PRIVATE_KEY
+let pk = env.PRIVATE_KEY ? env.PRIVATE_KEY.trim() : '';
+if (!pk) {
+  console.error("❌ CRITICAL ERROR: PRIVATE_KEY is missing in environment variables!");
+  process.exit(1);
+}
+if (!pk.startsWith('0x')) {
+  pk = '0x' + pk;
+}
+if (pk.length !== 66) { // 0x + 64 hex chars
+  console.error("❌ CRITICAL ERROR: PRIVATE_KEY format is invalid! Must be 64 hex characters.");
+  process.exit(1);
 }
 
-const isAlchemySepolia = env.RPC_URL.includes('eth-sepolia.g.alchemy.com');
-const apiKeyMatch = env.RPC_URL.match(/\/v2\/([a-zA-Z0-9_-]+)$/);
-const apiKeySummary = apiKeyMatch ? apiKeyMatch[1].slice(-6) : 'Unknown';
+// 3. Validate CONTRACT_ADDRESS
+let contractAddr = env.CONTRACT_ADDRESS ? env.CONTRACT_ADDRESS.trim() : '';
+if (!contractAddr) {
+  console.error("❌ CRITICAL ERROR: CONTRACT_ADDRESS is missing in environment variables!");
+  process.exit(1);
+}
+if (!contractAddr.startsWith('0x') || contractAddr.length !== 42) {
+  console.error("❌ CRITICAL ERROR: CONTRACT_ADDRESS format is invalid!");
+  process.exit(1);
+}
 
-console.log(`Using RPC_URL: ${isAlchemySepolia ? 'Alchemy Sepolia' : 'Custom'} (...${apiKeySummary})`);
-
-if (env.RPC_URL && env.PRIVATE_KEY && env.CONTRACT_ADDRESS) {
-  let pk = env.PRIVATE_KEY;
-  if (!pk.startsWith('0x')) {
-    pk = '0x' + pk;
-  }
-  provider = new ethers.JsonRpcProvider(env.RPC_URL);
+// Initialize
+try {
+  provider = new ethers.JsonRpcProvider(rpcUrl);
   wallet = new ethers.Wallet(pk, provider);
-  contract = new ethers.Contract(env.CONTRACT_ADDRESS, contractABI, wallet);
-} else {
-  console.error("❌ CRITICAL ERROR: Blockchain credentials missing in .env!");
-  console.error("Ensure RPC_URL, PRIVATE_KEY, and CONTRACT_ADDRESS are set.");
-  process.exit(1); // Fail fast
+  contract = new ethers.Contract(contractAddr, contractABI, wallet);
+} catch (error) {
+  console.error("❌ CRITICAL ERROR: Failed to initialize blockchain instances:", error.message);
+  process.exit(1);
 }
 
 module.exports = {
