@@ -37,16 +37,22 @@ function VerifyContent() {
     setFileVerifyResult(null);
     setFile(null);
 
+    console.log(`[DEBUG] Verify Page: Starting verification for ID: ${idToVerify}`);
+    console.log(`[DEBUG] Verify Page: Fetching from base URL configured in api.js`);
+
     try {
       const res = await verifyCertificate(idToVerify);
       if (res.success) {
         setResult(res);
       }
     } catch (err) {
+      console.error("[DEBUG] Verify Page: Verification request failed", err);
       if (err.response?.status === 404) {
-        setError(`Payload ID "${idToVerify}" not found on the blockchain ledger.`);
+        setError(`Certificate not found: "${idToVerify}" does not exist on the ledger.`);
+      } else if (err.response?.status === 500) {
+        setError("Verification node error: The backend failed to query the blockchain.");
       } else {
-        setError("Network Error: Failed to connect to verification node.");
+        setError("Network error: Could not reach the verification API.");
       }
     } finally {
       setLoading(false);
