@@ -55,6 +55,7 @@ if (!contractAddr.startsWith('0x') || contractAddr.length !== 42) {
 
 // Initialize
 try {
+  console.log(`Using contract address: ${contractAddr.slice(0, 6)}...${contractAddr.slice(-4)}`);
   provider = new ethers.JsonRpcProvider(rpcUrl);
   wallet = new ethers.Wallet(pk, provider);
   contract = new ethers.Contract(contractAddr, contractABI, wallet);

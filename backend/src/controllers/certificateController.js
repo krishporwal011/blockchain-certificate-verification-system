@@ -98,11 +98,12 @@ const verifyCertificate = async (req, res, next) => {
   } catch (error) {
     console.error(`[DEBUG] Backend Verify: Error during blockchain lookup!`, error.message);
     if (error.message.includes('call revert exception') || error.message.includes('missing revert data')) {
-       // Graceful fallback for contract reading errors
        return res.status(404).json({ success: false, status: 'NOT_FOUND', message: 'Certificate not found (Blockchain exception)' });
     }
-    // Return 500 for network/RPC errors
-    res.status(500).json({ success: false, message: 'Blockchain node query failed', error: error.message });
+    if (error.code === 'BAD_DATA' || error.message.includes('could not decode result data')) {
+       return res.status(500).json({ success: false, message: 'Contract address or ABI mismatch. Are you sure the contract is deployed on this network at this address?' });
+    }
+    res.status(500).json({ success: false, message: 'Contract call failed', error: error.message });
   }
 };
 
