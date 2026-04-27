@@ -7,8 +7,24 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
+const allowedOrigins = process.env.FRONTEND_BASE_URL 
+  ? process.env.FRONTEND_BASE_URL.split(',').map(url => url.trim().replace(/\/$/, '')) // Remove trailing slashes
+  : ['http://localhost:3000'];
+
 app.use(cors({
-  origin: process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // allow requests with no origin like mobile apps or curl requests
+    if (!origin) return callback(null, true);
+    
+    // remove trailing slash from origin for comparison
+    const originToCheck = origin.replace(/\/$/, '');
+    
+    if (allowedOrigins.includes(originToCheck)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());

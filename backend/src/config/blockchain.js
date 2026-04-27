@@ -14,8 +14,12 @@ let wallet;
 let contract;
 
 if (env.RPC_URL && env.PRIVATE_KEY && env.CONTRACT_ADDRESS) {
+  let pk = env.PRIVATE_KEY;
+  if (!pk.startsWith('0x')) {
+    pk = '0x' + pk;
+  }
   provider = new ethers.JsonRpcProvider(env.RPC_URL);
-  wallet = new ethers.Wallet(env.PRIVATE_KEY, provider);
+  wallet = new ethers.Wallet(pk, provider);
   contract = new ethers.Contract(env.CONTRACT_ADDRESS, contractABI, wallet);
 } else {
   console.error("❌ CRITICAL ERROR: Blockchain credentials missing in .env!");
