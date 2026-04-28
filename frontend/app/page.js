@@ -67,6 +67,8 @@ export default function Home() {
           <p className="text-slate-400 leading-relaxed font-light">End-users can instantly validate authenticity by decrypting the cryptographic signature via the public verification portal.</p>
         </div>
       </div>
+
+      <p className="mt-10 text-sm text-slate-500">Created by Team Eternal ❤️</p>
     </div>
   );
 }
